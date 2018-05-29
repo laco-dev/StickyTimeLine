@@ -68,6 +68,7 @@ class TimeLineRecyclerView(context: Context?, attrs: AttributeSet?) : RecyclerVi
     fun addItemDecoration(callback: RecyclerSectionItemDecoration.SectionCallback) {
         recyclerViewAttr?.let {
             this.addItemDecoration(RecyclerSectionItemDecoration(context,
+                    layoutManager.layoutDirection,
                     callback,
                     it))
         }
