@@ -60,9 +60,9 @@ class RecyclerSectionItemDecoration(
                 parent,
                 state
         )
+        val pos = parent.getChildAdapterPosition(view)
 
         if (layoutDirection == VERTICAL) {
-            val pos = parent.getChildAdapterPosition(view)
 
             if (getIsSection(pos)) outRect.top = headerOffset
             else {
@@ -76,7 +76,10 @@ class RecyclerSectionItemDecoration(
             outRect.left = leftMargin
             outRect.right = rightMargin
         } else if (layoutDirection == HORIZONTAL) {
-
+            outRect.top = 200
+            outRect.left = 56
+            outRect.right = 56
+            outRect.bottom = 16
         }
 
     }
@@ -103,6 +106,7 @@ class RecyclerSectionItemDecoration(
         val childInContact = getChildInContact(parent, headerOffset * 2)
         val contractPosition = parent.getChildAdapterPosition(childInContact)
 
+        // when meet header view, move header view
         if (getIsSection(contractPosition) && recyclerViewAttr.isSticky) {
             childInContact?.let {
                 val topChild = parent.getChildAt(0) ?: return
@@ -123,6 +127,7 @@ class RecyclerSectionItemDecoration(
             }
         }
 
+        // draw header view
         for (i in 0 until parent.childCount) {
             val child = parent.getChildAt(i)
             val position = parent.getChildAdapterPosition(child)
@@ -207,9 +212,9 @@ class RecyclerSectionItemDecoration(
             c.drawLines(
                     floatArrayOf(
                             0f,
-                            defaultOffset * 3f,
+                            defaultOffset * 3f * 2,
                             parent.width.toFloat(),
-                            defaultOffset * 3f
+                            defaultOffset * 3f * 2
                     ), paint
             )
         }
