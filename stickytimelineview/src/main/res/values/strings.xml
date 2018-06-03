@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TimeLineView</string>
+    <string name="error_support_only_linear">TimeLineRecyclerView Currently only LinearLayoutManager is supported.</string>
 </resources>

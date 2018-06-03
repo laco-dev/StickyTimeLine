@@ -2,6 +2,7 @@ package xyz.sangcomz.stickytimelineview
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import xyz.sangcomz.stickytimelineview.model.RecyclerViewAttr
@@ -66,9 +67,15 @@ class TimeLineRecyclerView(context: Context?, attrs: AttributeSet?) : RecyclerVi
      * @param callback SectionCallback
      */
     fun addItemDecoration(callback: RecyclerSectionItemDecoration.SectionCallback) {
+        val orientation: Int
+        val lm = layoutManager
+        if (lm is LinearLayoutManager) orientation = lm.orientation
+        else
+            throw  IllegalStateException(context.getString(R.string.error_support_only_linear))
+
         recyclerViewAttr?.let {
             this.addItemDecoration(RecyclerSectionItemDecoration(context,
-                    layoutManager.layoutDirection,
+                    orientation,
                     callback,
                     it))
         }

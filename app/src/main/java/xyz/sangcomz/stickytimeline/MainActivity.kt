@@ -3,35 +3,55 @@ package xyz.sangcomz.stickytimeline
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.activity_main.*
 import xyz.sangcomz.stickytimelineview.RecyclerSectionItemDecoration
-import xyz.sangcomz.stickytimelineview.TimeLineRecyclerView
 import xyz.sangcomz.stickytimelineview.model.SectionInfo
 
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val recyclerView: TimeLineRecyclerView = findViewById(R.id.recycler_view)
+        //Get data
+        val singerList = getSingerList()
+        setVerticalList(singerList)
+        setHorizontalList(singerList)
 
+
+    }
+
+    private fun setVerticalList(singerList: List<Singer>) {
         //Currently only LinearLayoutManager is supported.
-        recyclerView.layoutManager = LinearLayoutManager(this,
+        rv_main_vertical.layoutManager = LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL,
+                false)
+
+        //Add RecyclerSectionItemDecoration.SectionCallback
+        rv_main_vertical.addItemDecoration(getSectionCallback(singerList))
+
+
+        //Set Adapter
+        rv_main_vertical.adapter = SingerAdapter(layoutInflater,
+                singerList,
+                R.layout.item_vertical)
+    }
+
+    private fun setHorizontalList(singerList: List<Singer>) {
+        //Currently only LinearLayoutManager is supported.
+        rv_main_horizontal.layoutManager = LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL,
                 false)
 
-        //Get data
-        val singerList = getSingerList()
-
-
         //Add RecyclerSectionItemDecoration.SectionCallback
-        recyclerView.addItemDecoration(getSectionCallback(singerList))
+        rv_main_horizontal.addItemDecoration(getSectionCallback(singerList))
+
 
         //Set Adapter
-        recyclerView.adapter = SingerAdapter(layoutInflater,
+        rv_main_horizontal.adapter = SingerAdapter(layoutInflater,
                 singerList,
-                R.layout.recycler_row)
+                R.layout.item_horizontal)
     }
+
 
     //Get data method
     private fun getSingerList(): List<Singer> = SingerRepo().singerList

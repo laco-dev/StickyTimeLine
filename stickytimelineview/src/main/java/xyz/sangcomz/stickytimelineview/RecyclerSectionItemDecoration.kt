@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -31,7 +32,7 @@ import xyz.sangcomz.stickytimelineview.model.SectionInfo
  */
 class RecyclerSectionItemDecoration(
         context: Context,
-        private val layoutDirection: Int,
+        private val orientation: Int,
         private val sectionCallback: SectionCallback,
         private val recyclerViewAttr: RecyclerViewAttr
 ) : RecyclerView.ItemDecoration() {
@@ -62,7 +63,7 @@ class RecyclerSectionItemDecoration(
         )
         val pos = parent.getChildAdapterPosition(view)
 
-        if (layoutDirection == VERTICAL) {
+        if (orientation == VERTICAL) {
 
             if (getIsSection(pos)) outRect.top = headerOffset
             else {
@@ -75,7 +76,7 @@ class RecyclerSectionItemDecoration(
             outRect.bottom = defaultOffset / 2
             outRect.left = leftMargin
             outRect.right = rightMargin
-        } else if (layoutDirection == HORIZONTAL) {
+        } else if (orientation == HORIZONTAL) {
             outRect.top = 200
             outRect.left = 56
             outRect.right = 56
@@ -106,6 +107,9 @@ class RecyclerSectionItemDecoration(
         val childInContact = getChildInContact(parent, headerOffset * 2)
         val contractPosition = parent.getChildAdapterPosition(childInContact)
 
+
+        println("childInContact  :::: ${getChildInContact(parent, 56)} ")
+        println("contractPosition :::: $contractPosition")
         // when meet header view, move header view
         if (getIsSection(contractPosition) && recyclerViewAttr.isSticky) {
             childInContact?.let {
@@ -199,7 +203,7 @@ class RecyclerSectionItemDecoration(
         paint.color = recyclerViewAttr.sectionLineColor
         paint.strokeWidth = recyclerViewAttr.sectionLineWidth
 
-        if (layoutDirection == VERTICAL) {
+        if (orientation == VERTICAL) {
             c.drawLines(
                     floatArrayOf(
                             defaultOffset * 3f,
@@ -208,7 +212,7 @@ class RecyclerSectionItemDecoration(
                             parent.height.toFloat()
                     ), paint
             )
-        } else if (layoutDirection == HORIZONTAL) {
+        } else if (orientation == HORIZONTAL) {
             c.drawLines(
                     floatArrayOf(
                             0f,
@@ -231,7 +235,10 @@ class RecyclerSectionItemDecoration(
                         parent.getChildAt(it)
                     }
                     .firstOrNull {
-                        it.top in contactPoint / 2..contactPoint
+                        if (orientation == LinearLayoutManager.VERTICAL)
+                            it.top in contactPoint / 2..contactPoint
+                        else
+                            it.left in contactPoint / 2..contactPoint
                     }
 
     /**
@@ -286,7 +293,7 @@ class RecyclerSectionItemDecoration(
     }
 
     private fun inflateHeaderView(parent: RecyclerView): View {
-        return if (layoutDirection == VERTICAL)
+        return if (orientation == VERTICAL)
             LayoutInflater.from(parent.context)
                     .inflate(
                             R.layout.recycler_ver_section_header,

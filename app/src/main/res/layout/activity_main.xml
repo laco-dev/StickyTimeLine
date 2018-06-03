@@ -7,8 +7,24 @@
     tools:context="xyz.sangcomz.stickytimeline.MainActivity">
 
     <xyz.sangcomz.stickytimelineview.TimeLineRecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:isSticky="true" />
+        android:id="@+id/rv_main_vertical"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:isSticky="true"
+        app:layout_constraintBottom_toTopOf="@id/rv_main_horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <xyz.sangcomz.stickytimelineview.TimeLineRecyclerView
+        android:id="@+id/rv_main_horizontal"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:isSticky="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rv_main_vertical" />
 </android.support.constraint.ConstraintLayout>

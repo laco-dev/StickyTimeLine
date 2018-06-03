@@ -29,7 +29,7 @@ class SingerAdapter(private val layoutInflater: LayoutInflater,
     override fun getItemCount(): Int = singerList.size
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val fullName: TextView = view.findViewById<View>(R.id.full_name_tv) as TextView
+        val fullName: TextView = view.findViewById<View>(R.id.tv_item_name) as TextView
 
     }
 }
