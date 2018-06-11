@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.support.v7.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import android.widget.TextView
 import xyz.sangcomz.stickytimelineview.ext.DP
 import xyz.sangcomz.stickytimelineview.model.RecyclerViewAttr
 import xyz.sangcomz.stickytimelineview.model.SectionInfo
+
 
 /*
  */
@@ -95,21 +97,79 @@ class RecyclerSectionItemDecoration(
      * @param state The current state of RecyclerView.
      */
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
-        super.onDrawOver(
-                c,
-                parent,
-                state
-        )
+        super.onDrawOver(c, parent, state)
+        drawLine(c, parent)
+
+        when (orientation) {
+
+            VERTICAL -> {
+                onDrawOverHeaderWhenVertical(c, parent)
+            }
+
+            HORIZONTAL -> {
+                onDrawOverHeaderWhenHorizontal(c, parent)
+            }
+
+            else -> {
+
+            }
+        }
+
+    }
+
+    private fun onDrawOverHeaderWhenVertical(c: Canvas, parent: RecyclerView) {
         var previousHeader = SectionInfo("", "")
         if (headerView == null) getHeaderView(parent)
-        drawLine(c, parent)
 
         val childInContact = getChildInContact(parent, headerOffset * 2)
         val contractPosition = parent.getChildAdapterPosition(childInContact)
 
+        // when meet header view, move header view
+        if (getIsSection(contractPosition) && recyclerViewAttr.isSticky) {
+            childInContact?.let {
+                val topChild = parent.getChildAt(0) ?: return
+                val topChildPosition = parent.getChildAdapterPosition(topChild)
+                headerView?.let {
+                    sectionCallback.getSectionHeader(topChildPosition)?.let { sectionInfo ->
+                        previousHeader = sectionInfo
+                        setHeaderView(sectionInfo)
+                        val offset =
+                                if (topChildPosition == 0
+                                        && childInContact.top - (headerOffset * 2) == (-1 * headerOffset)) 0f
+                                else
+                                    (childInContact.top - (headerOffset * 2)).toFloat()
 
-        println("childInContact  :::: ${getChildInContact(parent, 56)} ")
-        println("contractPosition :::: $contractPosition")
+                        moveHeader(c, it, offset)
+                    }
+                }
+            }
+        }
+
+        // draw header view
+        for (i in 0 until parent.childCount) {
+            val child = parent.getChildAt(i)
+            val position = parent.getChildAdapterPosition(child)
+
+            sectionCallback.getSectionHeader(position)?.let { sectionInfo ->
+                setHeaderView(sectionInfo)
+                if (previousHeader != sectionInfo) {
+                    headerView?.let {
+                        drawHeader(c, child, it)
+                        previousHeader = sectionInfo
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun onDrawOverHeaderWhenHorizontal(c: Canvas, parent: RecyclerView) {
+        var previousHeader = SectionInfo("", "")
+        if (headerView == null) getHeaderView(parent)
+
+        val childInContact = getChildInContact(parent, 56)
+        val contractPosition = parent.getChildAdapterPosition(childInContact)
+
         // when meet header view, move header view
         if (getIsSection(contractPosition) && recyclerViewAttr.isSticky) {
             childInContact?.let {
@@ -150,7 +210,7 @@ class RecyclerSectionItemDecoration(
     }
 
     /**
-     * First create a header view.
+     * Init header view.
      */
     private fun getHeaderView(parent: RecyclerView) {
         headerView = inflateHeaderView(parent)
@@ -175,7 +235,22 @@ class RecyclerSectionItemDecoration(
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, attrs.sectionSubTitleTextSize)
                 }
             }
-            fixLayoutSize(headerView, parent)
+            when (orientation) {
+
+                VERTICAL -> {
+                    fixLayoutSize(headerView, parent)
+
+                }
+
+                HORIZONTAL -> {
+                    fixHorizontalLayoutSize(headerView, parent)
+
+                }
+
+                else -> {
+
+                }
+            }
         }
     }
 
@@ -191,6 +266,55 @@ class RecyclerSectionItemDecoration(
             } ?: kotlin.run {
                 visibility = View.GONE
             }
+        }
+
+        val titleWidth = getExpectTextWidth(headerTitle?.text as String, headerTitle?.textSize!!)
+        val subTitleWidth = getExpectTextWidth(headerSubTitle?.text as String, headerSubTitle?.textSize!!)
+
+
+        println("headerView?.width :::: ${headerView?.width}")
+        println("headerTitle?.width :::: ${headerTitle?.width}")
+        println("headerSubTitle?.width :::: ${headerSubTitle?.width}")
+        println("titleWidth :::: $titleWidth")
+        println("subTitleWidth :::: $subTitleWidth")
+
+
+        headerView?.let {
+
+
+            //            if (titleWidth > subTitleWidth)
+//                it.measure(titleWidth, it.height)
+//            else
+//                it.measure(subTitleWidth, it.height)
+//
+//            if (titleWidth > subTitleWidth)
+//                it.layout(0, 0, titleWidth, it.height)
+//            else
+//                it.layout(0, 0, subTitleWidth, it.height)
+
+//            headerTitle?.apply {
+//                it.measure(titleWidth, it.height)
+//                it.layout(0, 0, titleWidth, it.height)
+//            }
+
+            headerBackground?.apply {
+                it.measure(0, it.height)
+                it.layout(0, 0, subTitleWidth, it.height)
+            }
+
+
+//            headerBackground?.apply {
+//                if (subTitleWidth > titleWidth){
+//                    it.measure(subTitleWidth, it.measuredHeight)
+//                    it.layout(0, 0, subTitleWidth, it.height)
+//                }else{
+//                    it.measure(titleWidth, it.measuredHeight)
+//                    it.layout(0, 0, titleWidth, it.height)
+//                }
+//            }
+//
+//            it.invalidate()
+
         }
 
     }
@@ -237,8 +361,10 @@ class RecyclerSectionItemDecoration(
                     .firstOrNull {
                         if (orientation == LinearLayoutManager.VERTICAL)
                             it.top in contactPoint / 2..contactPoint
-                        else
+                        else {
+//                            println("onDrawOver it.left :::: ${it.left}")
                             it.left in contactPoint / 2..contactPoint
+                        }
                     }
 
     /**
@@ -348,6 +474,44 @@ class RecyclerSectionItemDecoration(
     }
 
     /**
+     * Measures the headerTitle view to make sure its size is greater than 0 and will be drawn
+     * https://yoda.entelect.co.za/view/9627/how-to-android-recyclerview-item-decorations
+     */
+    private fun fixHorizontalLayoutSize(view: View, parent: ViewGroup) {
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(
+                parent.width,
+                View.MeasureSpec.UNSPECIFIED
+        )
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(
+                parent.height,
+                View.MeasureSpec.EXACTLY
+        )
+
+        val childWidth = ViewGroup.getChildMeasureSpec(
+                widthSpec,
+                parent.paddingLeft + parent.paddingRight,
+                view.layoutParams.width
+        )
+        val childHeight = ViewGroup.getChildMeasureSpec(
+                heightSpec,
+                parent.paddingTop + parent.paddingBottom,
+                view.layoutParams.height
+        )
+
+        view.measure(
+                childWidth,
+                childHeight
+        )
+
+        view.layout(
+                0,
+                0,
+                view.measuredWidth,
+                view.measuredHeight
+        )
+    }
+
+    /**
      * To check if section is
      */
     private fun getIsSection(position: Int): Boolean = when (position) {
@@ -363,6 +527,18 @@ class RecyclerSectionItemDecoration(
 
     }
 
+    fun getExpectTextWidth(str: String, size: Float): Int {
+        val paint = Paint()
+        val bounds = Rect()
+
+        paint.typeface = Typeface.DEFAULT// your preference here
+        paint.textSize = size// have this the same as your text size
+
+
+        paint.getTextBounds(str, 0, str.length, bounds)
+
+        return bounds.width()
+    }
 
     /**
      * Section-specific callback interface

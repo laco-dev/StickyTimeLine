@@ -11,6 +11,10 @@ class SingerRepo {
     val singerList: List<Singer>
         get() {
             val singerList = ArrayList<Singer>()
+//            singerList.add(Singer("Sample Long Long", "1990.01", "Jeong"))
+//            singerList.add(Singer("Sample Long Long", "1990.01", "Seok"))
+//            singerList.add(Singer("Sample Long Long", "1990.01", "won"))
+
             singerList.add(Singer("Solo", "1995.04", "Lim Chang Jung"))
 
             singerList.add(Singer("FIN.K.L", "1998.05", "Lee Jin"))
