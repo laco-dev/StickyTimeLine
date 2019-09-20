@@ -2,12 +2,16 @@ package xyz.sangcomz.stickytimeline
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import xyz.sangcomz.stickytimelineview.RecyclerSectionItemDecoration
 import xyz.sangcomz.stickytimelineview.TimeLineRecyclerView
+import xyz.sangcomz.stickytimelineview.ext.DP
+import xyz.sangcomz.stickytimelineview.ext.dpToPx
+import xyz.sangcomz.stickytimelineview.model.RecyclerViewAttr
 import xyz.sangcomz.stickytimelineview.model.SectionInfo
 
 class MainActivity : AppCompatActivity() {
@@ -36,9 +40,9 @@ class MainActivity : AppCompatActivity() {
 
         //Currently only LinearLayoutManager is supported.
         recyclerView.layoutManager = LinearLayoutManager(
-            this,
-            RecyclerView.VERTICAL,
-            false
+                this,
+                RecyclerView.VERTICAL,
+                false
         )
 
         //Get data
@@ -46,14 +50,20 @@ class MainActivity : AppCompatActivity() {
 
 
         //Add RecyclerSectionItemDecoration.SectionCallback
-        recyclerView.addItemDecoration(getSectionCallback(singerList))
+        // recyclerView.addItemDecoration(getSectionCallback(singerList))
 
         //Set Adapter
         recyclerView.adapter = SingerAdapter(
-            layoutInflater,
-            singerList,
-            R.layout.recycler_row
+                layoutInflater,
+                singerList,
+                R.layout.recycler_row
         )
+
+        recyclerView.addItemDecoration(getSectionCallback(singerList))
+
+//        recyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
+//
+//        }, 0)
     }
 
     //Get data method
@@ -65,10 +75,13 @@ class MainActivity : AppCompatActivity() {
         return object : RecyclerSectionItemDecoration.SectionCallback {
             //In your data, implement a method to determine if this is a section.
             override fun isSection(position: Int): Boolean =
-                singerList[position].debuted != singerList[position - 1].debuted
+                    singerList[position].debuted != singerList[position - 1].debuted
 
             //Implement a method that returns a SectionHeader.
             override fun getSectionHeader(position: Int): SectionInfo? {
+                /**
+                 * Todo group을 특정하기 힘들다
+                 */
                 val singer = singerList[position]
                 val dot: Drawable? = when (singer.group) {
                     "FIN.K.L" -> {

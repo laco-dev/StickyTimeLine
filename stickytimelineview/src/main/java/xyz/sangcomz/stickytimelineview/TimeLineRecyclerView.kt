@@ -1,7 +1,13 @@
 package xyz.sangcomz.stickytimelineview
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.AttributeSet
+import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.StyleRes
+import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import xyz.sangcomz.stickytimelineview.model.RecyclerViewAttr
@@ -27,19 +33,26 @@ class TimeLineRecyclerView(context: Context, attrs: AttributeSet?) : RecyclerVie
 
     private var recyclerViewAttr: RecyclerViewAttr? = null
 
+    /**
+     * Todo lateinit var
+     */
+    // private lateinit var recyclerViewAttr: RecyclerViewAttr
     init {
         attrs?.let {
-            val a = context?.theme?.obtainStyledAttributes(
+            /**
+             * Todo context.obtainStyleAttributes >> 그리고 NonNull이다.
+             */
+            // context.obtainStyledAttributes(...)
+            val a = context.theme?.obtainStyledAttributes(
                     attrs,
                     R.styleable.TimeLineRecyclerView,
                     0, 0)
 
             a?.let {
                 recyclerViewAttr =
-                        RecyclerViewAttr(it.getColor(R.styleable.TimeLineRecyclerView_sectionBackgroundColor,
-                                ContextCompat.getColor(context, R.color.colorDefaultBackground)),
-                                it.getColor(R.styleable.TimeLineRecyclerView_sectionTitleTextColor,
-                                        ContextCompat.getColor(context, R.color.colorDefaultTitle)),
+                        RecyclerViewAttr(
+                                getColor(it, R.styleable.TimeLineRecyclerView_sectionBackgroundColor, R.color.colorDefaultBackground),
+                                getColor(it, R.styleable.TimeLineRecyclerView_sectionTitleTextColor, R.color.colorDefaultTitle),
                                 it.getColor(R.styleable.TimeLineRecyclerView_sectionSubTitleTextColor,
                                         ContextCompat.getColor(context, R.color.colorDefaultSubTitle)),
                                 it.getColor(R.styleable.TimeLineRecyclerView_timeLineColor,
@@ -48,8 +61,7 @@ class TimeLineRecyclerView(context: Context, attrs: AttributeSet?) : RecyclerVie
                                         ContextCompat.getColor(context, R.color.colorDefaultTitle)),
                                 it.getColor(R.styleable.TimeLineRecyclerView_timeLineCircleStrokeColor,
                                         ContextCompat.getColor(context, R.color.colorDefaultStroke)),
-                                it.getDimension(R.styleable.TimeLineRecyclerView_sectionTitleTextSize,
-                                        context.resources.getDimension(R.dimen.title_text_size)),
+                                getDimension(it, R.styleable.TimeLineRecyclerView_sectionTitleTextSize, R.dimen.title_text_size),
                                 it.getDimension(R.styleable.TimeLineRecyclerView_sectionSubTitleTextSize,
                                         context.resources.getDimension(R.dimen.sub_title_text_size)),
                                 it.getDimension(R.styleable.TimeLineRecyclerView_timeLineWidth,
@@ -58,6 +70,16 @@ class TimeLineRecyclerView(context: Context, attrs: AttributeSet?) : RecyclerVie
                                 it.getDrawable(R.styleable.TimeLineRecyclerView_customDotDrawable))
             }
 
+            // Todo: Null 처리 이후
+            with(a!!) {
+                recyclerViewAttr =
+                        RecyclerViewAttr(
+                                color(R.styleable.TimeLineRecyclerView_sectionBackgroundColor, R.color.colorDefaultBackground),
+                                color(R.styleable.TimeLineRecyclerView_sectionTitleTextColor, R.color.colorDefaultTitle),
+                                // ...
+                                dimension(R.styleable.TimeLineRecyclerView_sectionSubTitleTextSize, R.dimen.sub_title_text_size),
+                                // ...
+            }
         }
     }
 
@@ -68,9 +90,32 @@ class TimeLineRecyclerView(context: Context, attrs: AttributeSet?) : RecyclerVie
      */
     fun addItemDecoration(callback: RecyclerSectionItemDecoration.SectionCallback) {
         recyclerViewAttr?.let {
-            this.addItemDecoration(RecyclerSectionItemDecoration(context,
-                    callback,
-                    it))
+            super.addItemDecoration(RecyclerSectionItemDecoration(context, callback, it))
         }
     }
+
+    /**
+     * Todo Deprecated
+     */
+    @Deprecated("Hello World", ReplaceWith("addItemDecoration(callback)", "xyz.sangcomz.stickytimelineview"))
+    override fun addItemDecoration(decor: ItemDecoration) {
+        super.addItemDecoration(decor)
+    }
+
+    @Deprecated("Hello World", ReplaceWith("addItemDecoration(callback)", "xyz.sangcomz.stickytimelineview"))
+    override fun addItemDecoration(decor: ItemDecoration, index: Int) {
+        super.addItemDecoration(decor, index)
+    }
+
+    /**
+     * Todo: TypedArray
+     */
+    private fun TypedArray.color(id: Int, defId: Int) = getColor(id, ContextCompat.getColor(context, defId))
+
+    private fun TypedArray.dimension(id: Int, defId: Int): Float = getDimension(id, context.resources.getDimension(defId))
 }
+
+@ColorInt
+fun ViewGroup.getColor(ta: TypedArray, id: Int, @ColorRes defId: Int): Int = ta.getColor(id, ContextCompat.getColor(context, defId))
+
+fun ViewGroup.getDimension(ta: TypedArray, id: Int, defId: Int): Float = ta.getDimension(id, context.resources.getDimension(defId))

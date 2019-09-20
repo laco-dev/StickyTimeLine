@@ -8,12 +8,15 @@ import java.util.*
 
 class SingerRepo {
     //solo
+    /**
+     * Todo Singer 가 타입이 불분명하다
+     */
     val singerList: List<Singer>
         get() {
             val singerList = ArrayList<Singer>()
+            singerList.add(Singer("FIN.K.L", "1998.05", "Lee Jin"))
             singerList.add(Singer("Solo", "1995.04", "Lim Chang Jung"))
 
-            singerList.add(Singer("FIN.K.L", "1998.05", "Lee Jin"))
             singerList.add(Singer("FIN.K.L", "1998.05", "Sung Yu Ri"))
             singerList.add(Singer("FIN.K.L", "1998.05", "Oak Joo Hyun"))
             singerList.add(Singer("FIN.K.L", "1998.05", "Lee Hyo Ri"))
